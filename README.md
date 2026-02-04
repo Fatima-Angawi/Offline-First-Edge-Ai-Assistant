@@ -24,7 +24,7 @@ The assistant eliminates recurring API costs, protects user data by default, and
 
 ## 🎯 Goals
 
-* Run a Large Language Model fully offline on Android/iOS
+* Run Language Model fully offline on Android/iOS
 * Dynamically adapt model precision to device capabilities (4-bit / 8-bit)
 * Manage RAM, KV Cache, and battery usage intelligently
 * Implement semantic sliding window context instead of naïve chat history
