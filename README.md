@@ -1,39 +1,40 @@
-# Offline-First-Edge-Ai-Assistant
+# Offline-First Edge AI Assistant
 
-Dynamic Model, Memory, and Context Management on Mobile Devices
-📌 Overview
+### Dynamic Model, Memory, and Context Management on Mobile Devices
 
-This project designs and implements an offline-first mobile assistant powered by compact quantized language models running entirely on-device.
+---
+
+## 📌 Overview
+
+This project designs and implements an **offline-first mobile assistant** powered by **compact quantized language models** running entirely **on-device**.
 
 The objective is not to build a chat app, but to explore:
 
-How intelligence behaves under hardware constraints.
+> **How intelligence behaves under hardware constraints.**
 
 The assistant eliminates recurring API costs, protects user data by default, and demonstrates advanced understanding of:
 
-Edge AI
+* Edge AI
+* Memory pressure handling
+* Quantization strategies
+* Context management
+* Mobile resource optimization
 
-Memory pressure handling
+---
 
-Quantization strategies
+## 🎯 Goals
 
-Context management
+* Run a Large Language Model fully offline on Android/iOS
+* Dynamically adapt model precision to device capabilities (4-bit / 8-bit)
+* Manage RAM, KV Cache, and battery usage intelligently
+* Implement semantic sliding window context instead of naïve chat history
+* Store memory locally with encryption (privacy by design)
 
-Mobile resource optimization
+---
 
-🎯 Goals
+## 🏗️ System Architecture
 
-Run a Large Language Model fully offline on Android/iOS
-
-Dynamically adapt model precision to device capabilities (4-bit / 8-bit)
-
-Manage RAM, KV Cache, and battery usage intelligently
-
-Implement semantic sliding window context instead of naïve chat history
-
-Store memory locally with encryption (privacy by design)
-
-🏗️ System Architecture
+```
 UI Layer
    ↓
 Chat Orchestrator
@@ -45,113 +46,123 @@ Model Manager (Quantization + Lazy Loading + KV Cache Control)
 MLC LLM Runtime
    ↓
 Encrypted Local Storage (SQLCipher)
+```
 
-🧩 Core Components
-1️⃣ Model Manager — Resource-Aware Model Control
+---
+
+## 🧩 Core Components
+
+### 1️⃣ Model Manager — Resource-Aware Model Control
 
 Responsible for:
 
-Lazy loading the model on demand
+* Lazy loading the model on demand
+* Selecting quantization level based on device RAM
+* Unloading model under memory pressure
+* Managing KV Cache growth during long conversations
+* Preloading frequently used models during idle time
 
-Selecting quantization level based on device RAM
+#### Logic
 
-Unloading model under memory pressure
-
-Managing KV Cache growth during long conversations
-
-Preloading frequently used models during idle time
-
-Logic
+```text
 if RAM < 4GB  → load 4-bit model
 if RAM ≥ 6GB → load 8-bit model
 
 if memory pressure → unload model
 if long conversation → clear KV cache
 if device idle → preload model
-
+```
 
 This proves understanding of how transformers consume memory over time.
 
-2️⃣ Context Manager — Semantic Sliding Window
+---
+
+### 2️⃣ Context Manager — Semantic Sliding Window
 
 Instead of keeping full chat history, the system:
 
-Converts each message into embeddings
+1. Converts each message into embeddings
+2. When context window is full:
 
-When context window is full:
+   * Compute semantic similarity
+   * Keep most relevant messages
+   * Archive the rest in local storage
 
-Compute semantic similarity
+This ensures the model always sees the **most relevant context**, not the most recent.
 
-Keep most relevant messages
+---
 
-Archive the rest in local storage
-
-This ensures the model always sees the most relevant context, not the most recent.
-
-3️⃣ KV Cache Management (Transformer Internal Memory)
+### 3️⃣ KV Cache Management (Transformer Internal Memory)
 
 KV Cache grows with each token and can silently consume large RAM.
 
-Strategy:
+#### Strategy
 
+```text
 if KV cache exceeds threshold:
     summarize conversation
     reset context
     reload model with summary
-
+```
 
 This shows deep understanding of transformer internals.
 
-4️⃣ Battery-Aware Inference
+---
+
+### 4️⃣ Battery-Aware Inference
 
 The assistant adapts behavior based on battery state.
 
+```text
 if battery_low:
     reduce max_tokens
     batch inference requests
     defer embedding computation
-
+```
 
 Optimized for mobile efficiency.
 
-5️⃣ Offline-First Encrypted Memory
+---
 
-All user data is stored locally using SQLCipher:
+### 5️⃣ Offline-First Encrypted Memory
 
-Chat history
+All user data is stored locally using **SQLCipher**:
 
-Message embeddings
+* Chat history
+* Message embeddings
+* Conversation summaries
 
-Conversation summaries
-
+```
 message → embedding → encrypted database
-
+```
 
 Cloud sync is optional and requires user permission.
 
-6️⃣ Why MLC LLM
+---
+
+### 6️⃣ Why MLC LLM
 
 MLC LLM is chosen because it:
 
-Uses Vulkan / Metal for acceleration
+* Uses Vulkan / Metal for acceleration
+* Runs quantized models efficiently on mobile
+* Allows control over KV cache
+* Is significantly faster than PyTorch on edge devices
+* Supports GGUF quantized models
 
-Runs quantized models efficiently on mobile
+---
 
-Allows control over KV cache
-
-Is significantly faster than PyTorch on edge devices
-
-Supports GGUF quantized models
-
-🔁 Orchestration Flow
+## 🔁 Orchestration Flow
 
 Instead of directly calling a model:
 
+```python
 model.generate(prompt)
-
+```
 
 The system performs:
 
+```python
 model = ModelManager.load(device_specs)
 
 context = ContextManager.build(messages)
@@ -159,53 +170,51 @@ context = ContextManager.build(messages)
 response = model.generate(context)
 
 MemoryStore.save(messages, embeddings)
+```
 
+This is an **Edge AI orchestration system**, not a simple inference call.
 
-This is an Edge AI orchestration system, not a simple inference call.
+---
 
-🔐 Privacy by Design
+## 🔐 Privacy by Design
 
-No external API calls
+* No external API calls
+* No cloud dependency
+* Encrypted storage at rest
+* User-controlled synchronization
 
-No cloud dependency
+---
 
-Encrypted storage at rest
-
-User-controlled synchronization
-
-🧪 What This Project Demonstrates
+## 🧪 What This Project Demonstrates
 
 This project demonstrates practical understanding of:
 
-Quantization techniques (4-bit / 8-bit)
+* Quantization techniques (4-bit / 8-bit)
+* Memory pressure management
+* KV Cache control
+* Semantic context retention
+* On-device inference optimization
+* Privacy-first system design
+* Edge ML engineering
 
-Memory pressure management
+---
 
-KV Cache control
+## 🏁 Project Title
 
-Semantic context retention
+> **Designing an Offline-First Mobile Assistant Using Quantized Language Models with Dynamic Memory and Context Management**
 
-On-device inference optimization
+---
 
-Privacy-first system design
+## 🚀 Future Extensions
 
-Edge ML engineering
+* Multi-model support (summarization model, embedding model)
+* Adaptive summarization of long conversations
+* Cross-device encrypted sync
+* Voice interface
 
-🏁 Project Title
+---
 
-Designing an Offline-First Mobile Assistant Using Quantized Language Models with Dynamic Memory and Context Management
+## 🧠 Key Idea
 
-🚀 Future Extensions
-
-Multi-model support (summarization model, embedding model)
-
-Adaptive summarization of long conversations
-
-Cross-device encrypted sync
-
-Voice interface
-
-🧠 Key Idea
-
-This project is not about using a language model.
-It is about managing a language model under real hardware limits.
+> This project is not about using a language model.
+> It is about **managing** a language model under real hardware limits.
